@@ -1,49 +1,144 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Projekt Ofenplatten Klassifikation</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans scroll-smooth">
 
-<html>
-  <head>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-  </head>
-  <body>
+  <!-- Navigation -->
+  <header class="bg-white shadow-md sticky top-0 z-50">
+    <nav class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+      <h1 class="text-xl font-bold">Ofenplatten-Projekt</h1>
+      <ul class="flex space-x-6 text-gray-700 font-medium">
+        <li><a href="#upload" class="hover:text-blue-600">Bild hochladen</a></li>
+        <li><a href="#geschichte" class="hover:text-blue-600">Geschichte</a></li>
+        <li><a href="#produktion" class="hover:text-blue-600">Produktionsorte</a></li>
+        <li><a href="#kunst" class="hover:text-blue-600">Kunst & Stil</a></li>
+        <li><a href="#kontakt" class="hover:text-blue-600">Kontakt</a></li>
+      </ul>
+    </nav>
+  </header>
 
-  	Make sure to run this via a server
+  <!-- Hero Section -->
+  <section class="bg-gray-900 text-white py-24 px-6">
+    <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+      <div>
+        <h1 class="text-4xl md:text-5xl font-bold mb-4">Erkenne Ofenplatten mit KI</h1>
+        <p class="text-lg md:text-xl mb-6">Lade dein Bild hoch – wir sagen dir, was du siehst.</p>
+        <a href="#upload" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl transition">Jetzt starten</a>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <img src="https://rlp.museum-digital.de/data/rlp/images/201904/052028375ca7ba758847b.jpg" class="rounded-xl shadow-md" alt="Beispiel 1">
+        <img src="https://asset.museum-digital.org/rlp/images/201909/ofenplatte-hochzeit-zu-kana-35982.jpg" class="rounded-xl shadow-md" alt="Beispiel 2">
+        <img src="https://www.historisches-museum-bielefeld.de/wp-content/uploads/2016/04/Ofenplatte-klein.jpg" class="rounded-xl shadow-md" alt="Beispiel 3">
+        <img src="https://asset.museum-digital.org/rlp/images/201905/162044325cddcbb0b6508.jpg" class="rounded-xl shadow-md" alt="Beispiel 4">
+      </div>
+    </div>
+  </section>
 
-    <br>
-    <input accept="image/*" type='file' id="input_button" />
+  <!-- Upload Section -->
+  <section id="upload" class="py-16 px-6 md:px-16">
+    <h2 class="text-3xl font-semibold mb-10 text-center">Bild hochladen & erkennen</h2>
+    <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10">
 
-  	<br>
-    <img id="img1" src="./image.jpg" style="width: 300px " />
-    <br>  <br>
-    <button   onclick="predict()">predict</button>
-    <br>
-    <p id="result"> </p>
+      <!-- Linke Seite: Upload -->
+      <div class="bg-white rounded-xl shadow-md p-6 space-y-6">
+        <input accept="image/*" type='file' id="input_button" class="block w-full border border-gray-300 rounded-md p-2" />
+        <img id="img1" src="./image.jpg" alt="Vorschau" class="w-72 mx-auto rounded-md shadow-md" />
 
-    <script>
+        <!-- Fortschrittsbalken -->
+        <div id="loader" class="w-full bg-gray-200 rounded-full h-4 relative hidden">
+          <div class="absolute left-0 top-0 h-4 bg-blue-600 rounded-full animate-pulse w-2/3"></div>
+        </div>
 
-      let image = document.getElementById('img1');
-      let input_button = document.getElementById('input_button');
+        <div class="text-center">
+          <button onclick="predict()" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition">
+            Vorhersage starten
+          </button>
+          <p id="result" class="mt-4 text-xl font-semibold text-blue-700"></p>
+        </div>
+      </div>
 
-      input_button.onchange = evt => {
-        const [file] = input_button.files
-        if (file) {
-          image.src = URL.createObjectURL(file)
-        }
+      <!-- Rechte Seite: Erklärungen -->
+      <div class="bg-white rounded-xl shadow-md p-6 space-y-6">
+        <h3 class="text-2xl font-semibold">Kategorien erklärt</h3>
+
+        <div class="flex items-start space-x-4">
+          <img src="https://asset.museum-digital.org/rlp/images/201001/17165151288.jpg" alt="Linke Seitenplatte" class="rounded-md w-48 h-48 object-cover">
+          <div>
+            <h4 class="font-bold">Linke Seitenplatte</h4>
+            <p>Wird auf der linken Seite des Ofens angebracht. Oft spiegelverkehrt zur rechten Platte.</p>
+          </div>
+        </div>
+
+        <div class="flex items-start space-x-4">
+          <img src="https://owl.museum-digital.de/data/owl/images/43/17948-50/ofenplattensammlung_der_g/ofenplattensammlung-der-gemeinde-altenbeken-das-salomonische-urteil-nr-50-17948-592701.jpg" alt="Rechte Seitenplatte" class="rounded-md w-48 h-48 object-cover">
+          <div>
+            <h4 class="font-bold">Rechte Seitenplatte</h4>
+            <p>Befindet sich auf der rechten Seite. Häufig mit identischen Motiven wie links – nur gespiegelt.</p>
+          </div>
+        </div>
+
+        <div class="flex items-start space-x-4">
+          <img src="https://owl.museum-digital.de/data/owl/images/43/17925-145/stirnplatte_conradus_nigg/stirnplatte-conradus-niggemeier-und-elisabeth-ostermann-eines-fuenf-platten-ofens-aus-alte-377821__.__67a40.jpg" alt="Stirnplatte" class="rounded-md w-48 h-48 object-cover">
+          <div>
+            <h4 class="font-bold">Stirnplatte</h4>
+            <p>Die zentrale Frontplatte des Ofens. Meist mit besonders aufwändigen Motiven verziert.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Weitere Abschnitte wie Geschichte, Kunsthistorische Entwicklung, etc. -->
+
+  <footer class="bg-gray-800 text-white text-center py-6">
+    <p>&copy; 2025 Ofenplatten-Projekt | Eine Initiative zur Dokumentation historischer Gusskunst</p>
+  </footer>
+
+  <!-- Tensorflow Script -->
+  <script>
+    const image = document.getElementById('img1');
+    const input_button = document.getElementById('input_button');
+    const loader = document.getElementById('loader');
+    const result = document.getElementById('result');
+
+    input_button.onchange = evt => {
+      const [file] = input_button.files;
+      if (file) {
+        image.src = URL.createObjectURL(file);
+        result.innerText = "";
       }
+    }
 
-      async function predict() {
-        var  model = await tf.loadGraphModel('./model.json');
+    async function predict() {
+      loader.classList.remove('hidden');
+      result.innerText = "";
 
-        let example = tf.browser.fromPixels(document.getElementById("img1") , 3 ).cast('float32');
-        console.log(  example.shape  )
-        example = example.reshape([1,example.shape[0], example.shape[1] ,example.shape[2]]);
+      try {
+        const model = await tf.loadGraphModel('./model.json');
+
+        let example = tf.browser.fromPixels(image, 3).cast('float32');
+        example = example.reshape([1, example.shape[0], example.shape[1], example.shape[2]]);
 
         let prediction = await model.predict(example);
         let class_scores = await prediction.data();
-        let max_score_id =  class_scores.indexOf(Math.max(...class_scores));
-        let classes = [  "Linke Seitenplatte" ,  "Rechte Seitenplatte" ,  "Stirnplatte" ,  ] ;
+        let max_score_id = class_scores.indexOf(Math.max(...class_scores));
+        let classes = ["Linke Seitenplatte", "Rechte Seitenplatte", "Stirnplatte"];
 
-        console.log(class_scores);
-        document.getElementById("result").innerHTML = classes[max_score_id].toString();
+        result.innerText = `Erkannt: ${classes[max_score_id]}`;
+      } catch (error) {
+        result.innerText = "Fehler bei der Vorhersage. Bitte erneut versuchen.";
+        console.error(error);
+      } finally {
+        loader.classList.add('hidden');
       }
-    </script>
-  </body>
+    }
+  </script>
+
+</body>
 </html>
